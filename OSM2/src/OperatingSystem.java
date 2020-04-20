@@ -4,13 +4,17 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.concurrent.Semaphore;
+import java.util.Queue;
 
 
 public class OperatingSystem {
 	
 	public static ArrayList<Thread> ProcessTable;
+	public static	Queue<Process> ReadyQueue ;
+	public static 	Queue<Process> BlockedQueue;
 
 //	public static int activeProcess= 0;
 	//system calls:
@@ -69,18 +73,33 @@ public class OperatingSystem {
 		Process p = new Process(processID);
 		ProcessTable.add(p);
 		Process.setProcessState(p,ProcessState.Ready);
-		p.start();
+		//I wont make the process immediatly start running
+		//p.start();
 		
+		//I'll add the process to a queue
+		ReadyQueue.add(p);
 	}
 	
 	public static void main(String[] args) {
    		ProcessTable = new ArrayList<Thread>();
-
+   		ReadyQueue = new LinkedList<Process>();
+   		BlockedQueue = new LinkedList<Process>();
 		createProcess(1);
 		createProcess(2);
 		createProcess(3);
 		createProcess(4);
 		createProcess(5);
+		
+		while(!ReadyQueue.isEmpty()) {
+			Process p = ReadyQueue.remove();
+			if() {
+				
+			}
+			p.run();
+		}
+		
+		
+		
 
 	}
 }

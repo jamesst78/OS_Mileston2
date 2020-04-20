@@ -5,6 +5,7 @@ public class Process extends Thread {
 	
 	public int processID;
     ProcessState status=ProcessState.New;	
+    Boolean ranOnceBefore;
 
 	
 	public Process(int m) {
@@ -12,6 +13,8 @@ public class Process extends Thread {
 	}
 	@Override
 	public void run() {
+		//check for the ready queue whose next
+		
 		
 		switch(processID)
 		{
@@ -24,7 +27,12 @@ public class Process extends Thread {
 
 	}
 	
+	
 	private void process1() {
+		
+		// check for semaphore's availability
+		
+		//if no semaphore available , add to the blocked array
 		
 		OperatingSystem.printText("Enter File Name: ");
 		OperatingSystem.printText(OperatingSystem.readFile(OperatingSystem.TakeInput()));
