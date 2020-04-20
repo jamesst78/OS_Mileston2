@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 //import java.util.concurrent.Semaphore;
 
 
@@ -6,10 +8,12 @@ public class Process extends Thread {
 	public int processID;
     ProcessState status=ProcessState.New;	
     Boolean ranOnceBefore;
+    ArrayList<SemaphoreI> SemaphoreAccess;
 
 	
-	public Process(int m) {
+	public Process(int m , ArrayList<SemaphoreI> sems) {
 		processID = m;
+		this.SemaphoreAccess = sems;
 	}
 	@Override
 	public void run() {
@@ -27,17 +31,44 @@ public class Process extends Thread {
 
 	}
 	
+	public boolean SemWriteWait() {
+		for(int i = 0 ; i<SemaphoreAccess.size() ; i++) {
+			SemaphoreI s = this.SemaphoreAccess.get(i);
+			if(s.type.equals("Writing")) {
+				if(s.available == true) {
+					s.changeAvailability();
+					return true;
+				}
+				else {
+					return false;
+				}		
+			}
+		}
+		return false;
+		
+	}
+	public void SemWritePost(){
+		for(int i = 0 ; i<SemaphoreAccess.size() ; i++) {
+			SemaphoreI s = this.SemaphoreAccess.get(i);
+			if(s.type.equals("Writing"))
+			s.changeAvailability();
+		}
+	}
+	
 	
 	private void process1() {
-		
+		boolean proceed =this.SemWriteWait();
 		// check for semaphore's availability
-		
-		//if no semaphore available , add to the blocked array
-		
+		if(proceed) {
 		OperatingSystem.printText("Enter File Name: ");
 		OperatingSystem.printText(OperatingSystem.readFile(OperatingSystem.TakeInput()));
 		
 		setProcessState(this,ProcessState.Terminated);
+		this.SemWritePost();
+		}
+		else {
+			setProcessState(this, ProcessState.Waiting);
+		}
 		}
 	
 	private void process2() {
@@ -94,6 +125,10 @@ public class Process extends Thread {
 			 OperatingSystem.ProcessTable.remove(OperatingSystem.ProcessTable.indexOf(p));
 		 }
 	}
+	 
+	 public boolean checkIfCanUnblock() {
+		 
+	 }
 	 
 	 public static ProcessState getProcessState(Process p) {
 		 return p.status;

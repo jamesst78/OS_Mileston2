@@ -14,7 +14,8 @@ public class OperatingSystem {
 	
 	public static ArrayList<Thread> ProcessTable;
 	public static	Queue<Process> ReadyQueue ;
-	public static 	Queue<Process> BlockedQueue;
+	public static 	ArrayList<Process> BlockedQueue;
+	public static ArrayList<SemaphoreI> Semaphores;
 
 //	public static int activeProcess= 0;
 	//system calls:
@@ -69,8 +70,8 @@ public class OperatingSystem {
 		
 	}
 	
-	private static void createProcess(int processID){
-		Process p = new Process(processID);
+	private static void createProcess(int processID, ArrayList<SemaphoreI> sems){
+		Process p = new Process(processID,sems);
 		ProcessTable.add(p);
 		Process.setProcessState(p,ProcessState.Ready);
 		//I wont make the process immediatly start running
@@ -83,19 +84,49 @@ public class OperatingSystem {
 	public static void main(String[] args) {
    		ProcessTable = new ArrayList<Thread>();
    		ReadyQueue = new LinkedList<Process>();
-   		BlockedQueue = new LinkedList<Process>();
-		createProcess(1);
-		createProcess(2);
-		createProcess(3);
-		createProcess(4);
-		createProcess(5);
+   		BlockedQueue = new ArrayList<Process>();
+   		SemaphoreI s1 = new SemaphoreI("Reading");
+   		SemaphoreI s2 = new SemaphoreI("Writing");
+   		SemaphoreI s3 = new SemaphoreI("Printing");
+   		SemaphoreI s4 = new SemaphoreI("Input");
+   		Semaphores.add(s1);
+   		Semaphores.add(s2);
+   		Semaphores.add(s3);
+   		Semaphores.add(s4);
+
+   		
+		createProcess(1,Semaphores);
+		createProcess(2,Semaphores);
+		createProcess(3,Semaphores);
+		createProcess(4,Semaphores);
+		createProcess(5,Semaphores);
 		
 		while(!ReadyQueue.isEmpty()) {
 			Process p = ReadyQueue.remove();
-			if() {
+			if(p.status.equals(ProcessState.Ready)) {
+				//TODO: check if it was never ran before el awel , if it was , p.resume
+				p.run();
 				
+				
+				
+				if(p.status.equals(ProcessState.Waiting)) {
+					BlockedQueue.add(p);
+					ReadyQueue.remove(p);
+				}
 			}
-			p.run();
+			if(!BlockedQueue.isEmpty()) 
+			for(int i = 0 ; i<BlockedQueue.size() ; i ++){
+				Process pblocked = BlockedQueue.get(i);
+				Boolean decision = pblocked.checkIfCanUnblock();
+				if(decision) {
+					ReadyQueue.add(pblocked);
+					pblocked.status = ProcessState.Ready;
+					BlockedQueue.remove(i);
+					i--;
+				}
+			}
+			
+			
 		}
 		
 		
