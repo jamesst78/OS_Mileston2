@@ -81,10 +81,11 @@ public class OperatingSystem {
 		ReadyQueue.add(p);
 	}
 	
-	public static void main(String[] args) {
-   		ProcessTable = new ArrayList<Thread>();
+	public void scheduleAndDispatch() {
+		ProcessTable = new ArrayList<Thread>();
    		ReadyQueue = new LinkedList<Process>();
    		BlockedQueue = new ArrayList<Process>();
+   		Semaphores = new ArrayList<>();
    		SemaphoreI s1 = new SemaphoreI("Reading");
    		SemaphoreI s2 = new SemaphoreI("Writing");
    		SemaphoreI s3 = new SemaphoreI("Printing");
@@ -128,7 +129,12 @@ public class OperatingSystem {
 			
 			
 		}
-		
+	}
+	
+	public static void main(String[] args) {
+   	
+		OperatingSystem OS = new OperatingSystem();
+		OS.scheduleAndDispatch();
 		
 		
 
