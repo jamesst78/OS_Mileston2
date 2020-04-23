@@ -105,6 +105,7 @@ public class OperatingSystem {
 		while(!ReadyQueue.isEmpty()) {
 			Process p = ReadyQueue.remove();
 			if(p.status.equals(ProcessState.Ready)) {
+				System.out.println("Process " + p.processID + " is now running");
 				//TODO: check if it was never ran before el awel , if it was , p.resume
 				p.run();
 				
